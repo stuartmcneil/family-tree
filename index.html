@@ -51,8 +51,15 @@ header{
   padding:10px 16px;background:var(--bg-2);
   border-bottom:1px solid var(--line);flex-wrap:wrap;flex:none;
 }
-.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
-.brand svg{flex:none}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0;
+  border:0;background:none;padding:4px 8px 4px 4px;margin-left:-4px;border-radius:11px;
+  text-align:left;transition:.15s}
+.brand:hover{background:color-mix(in srgb,var(--accent) 12%, transparent)}
+.brand:hover h1{color:var(--accent)}
+.brand:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.brand svg{flex:none;transition:transform .3s cubic-bezier(.2,1.1,.3,1)}
+.brand:hover svg{transform:translateY(-1px) scale(1.06)}
+.brand h1{transition:color .15s}
 .brand h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:22px;margin:0;white-space:nowrap}
 .brand p{margin:0;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase}
 .tabs{display:flex;background:var(--card);border:1px solid var(--card-edge);border-radius:999px;padding:3px}
@@ -61,6 +68,10 @@ header{
 .tools{display:flex;gap:6px;align-items:center}
 .tool{border:1px solid var(--card-edge);background:var(--card);border-radius:9px;padding:7px 11px;font-size:12.5px;color:var(--ink-soft);transition:.15s;white-space:nowrap}
 .tool:hover{border-color:var(--accent);color:var(--ink)}
+a.tool{display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+a.tool.out{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%, var(--card-edge))}
+a.tool.out:hover{background:var(--accent);border-color:var(--accent);color:#fff8ee}
+a.tool.out svg{opacity:.8}
 .tool[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff8ee}
 .search{position:relative}
 .search input{font:inherit;font-size:13px;width:200px;padding:8px 12px 8px 32px;border-radius:9px;border:1px solid var(--card-edge);background:var(--card);color:var(--ink)}
@@ -223,7 +234,7 @@ body.panel-open #zoom{right:388px}
 <body>
 
 <header>
-  <div class="brand">
+  <button class="brand" id="home" title="Back to the start of the tree">
     <svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true">
       <path d="M13 30V17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".75"/>
       <path d="M13 20 5 13M13 20l8-7M13 15 8 9M13 15l5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
@@ -235,7 +246,7 @@ body.panel-open #zoom{right:388px}
       <h1>The McNeil Family Tree</h1>
       <p>Neil · Inward · Buck · Woolley · A&rsquo;Monge</p>
     </div>
-  </div>
+  </button>
 
   <div class="tabs" role="tablist" id="viewtabs">
     <button role="tab" data-view="anc" aria-selected="true">Ancestors</button>
@@ -255,6 +266,10 @@ body.panel-open #zoom{right:388px}
 
   <div class="tools">
     <button class="tool" id="btn-about">About</button>
+    <a class="tool out" href="https://stuartmcneil.github.io/window/" target="_blank"
+       rel="noopener noreferrer" title="stuartmcneil.github.io">Stuart McNeil<svg width="10" height="10"
+       viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4 2h6v6M10 2 2.5 9.5"
+       stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
 </header>
 
@@ -798,6 +813,26 @@ function showAbout(){
   render();
 }
 document.getElementById("btn-about").onclick = showAbout;
+
+/* the tree mark takes you home: opening view, opening branches, nothing selected */
+document.getElementById("home").onclick = () => {
+  closePanel();
+  state.ancOpen = new Set([ROOT_ID, "howard", "lynette"]);
+  state.desOpen = new Set();
+  state.desRoot = PROGENITORS[0].id;
+  state.fam = FAMILIES[0].k;
+  state.famSort = "date";
+  state.mapMode = "b";
+  state.mapFam = "all";
+  state.mapPlace = null;
+  q.value = "";
+  results.classList.remove("open");
+  state.seenPaths = new Set(); state.seenNodes = new Set();
+  nodeLayer.innerHTML = "";
+  state.view = "anc";
+  setView("anc");
+  render({ fit: true });
+};
 
 /* =====================================================================
    Navigation

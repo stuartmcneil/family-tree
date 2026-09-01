@@ -51,6 +51,8 @@ free. If you would rather the tree stayed off the open web, keep the repo privat
 | **Grow all** / **Prune** | opens every branch in the current view, or folds back to the opening one |
 | **Search** (or press `/`) | finds anyone by name, place, year or occupation and travels to them, opening the branches on the way |
 | **Drag / scroll** | pan and zoom anywhere, tree or map; **Fit** re-centres |
+| **The tree mark, top left** | back to the start — opening view, opening branches, filters and search cleared |
+| **Stuart McNeil, top right** | opens [stuartmcneil.github.io/window](https://stuartmcneil.github.io/window/) in a new tab |
 
 Dashed branches mark a parent link the sheets *imply* by layout rather than state outright.
 Those are the first places worth checking against a certificate or census.
