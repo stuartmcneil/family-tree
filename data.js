@@ -412,8 +412,9 @@ const PEOPLE = {
     f: "ernest_g_inward", mo: "eliz_beckford", src: "S4",
     no: ["Emigrated to the USA — New York."] },
   frederick_inward_1867: { n: "Frederick Inward", b: "1867 — Poplar",
+    bap: "1873 — Silvertown",
     f: "george_inward_1840", mo: "sarah_hutchings", src: "S4",
-    no: ["Baptised 1873 at Silvertown; moved to Grimsby."] },
+    no: ["Moved to Grimsby."] },
   eliza_eliz_inward: { n: "Eliza Elizabeth Inward", b: "1866", d: "1866",
     f: "george_inward_1840", mo: "sarah_hutchings", src: "S4" },
 
@@ -530,14 +531,15 @@ const PEOPLE = {
     sp: "samuel_innard_sr", src: "S4", no: ["Second wife."] },
   william_innard_1773: { n: "William Innard", b: "1773",
     f: "samuel_innard_sr", mo: "jane_spinney", src: "S4" },
-  john_innard_1770: { n: "John Innard", b: "1770", d: "1774",
+  john_innard_1770: { n: "John Innard", b: "1770", d: "1774", dp: "darenth",
     f: "samuel_innard_sr", mo: "jane_spinney", src: "S4",
     no: ["John and his brother Samuel died in a fire at Gore Farm, Darenth, on 2 April 1774."] },
-  samuel_innard_1768: { n: "Samuel Innard", b: "1768", d: "1774",
+  samuel_innard_1768: { n: "Samuel Innard", b: "1768", d: "1774", dp: "darenth",
     f: "samuel_innard_sr", mo: "jane_spinney", src: "S4",
     no: ["Died with his brother John in the fire at Gore Farm, Darenth, 2 April 1774."] },
-  james_illegit: { n: "James Innard", f: "samuel_innard_sr", src: "S4", un: true,
-    no: ["Illegitimate; baptised 1795 at Crayford."] },
+  james_illegit: { n: "James Innard", bap: "1795 — Crayford",
+    f: "samuel_innard_sr", src: "S4", un: true,
+    no: ["Recorded on the sheet as illegitimate."] },
   martha_inward_newman: { n: "Martha Newman", nee: "Inward", m: "1798, Wilmington",
     sp: "edward_newman", f: "samuel_innard_sr", src: "S4", un: true },
   edward_newman: { n: "Edward Newman", m: "1798, Wilmington",
@@ -750,6 +752,128 @@ const PROGENITORS = [
     note: "Tree 2 — Rochford and Upminster, Essex" },
   { id: "thomas_innard_t2", label: "Thomas & Elisabeth Innard",
     note: "Tree 2" }
+];
+
+/* ---------------------------------------------------------------------------
+   Gazetteer
+   ---------------------------------------------------------------------------
+   Birth and death places are worked out by scanning each person's `b`, `bap`
+   and `d` text for the aliases below — so adding a person with a place already
+   in this list puts them on the map with no extra work. ORDER MATTERS: the
+   first alias that appears in the text wins, so the most specific places are
+   listed first and the county-level fallbacks last.
+
+   Set `bp` / `dp` on a person to override the guess with a place key — used
+   where the place is only mentioned in the notes (the Gore Farm fire, say).
+
+   `approx: true` marks a place recorded only as a county or region; those are
+   drawn as hollow rings on the map rather than solid pins.
+   ------------------------------------------------------------------------- */
+const PLACES = [
+  // --- London and the Thames-side parishes ---
+  { k:"greenwich",   n:"Greenwich",            r:"England", lat:51.483, lon:-0.008, alias:["Greenwich"] },
+  { k:"plaistow",    n:"Plaistow",             r:"England", lat:51.532, lon: 0.018, alias:["Plaistow"] },
+  { k:"silvertown",  n:"Silvertown",           r:"England", lat:51.502, lon: 0.045, alias:["Silvertown"] },
+  { k:"poplar",      n:"Poplar",               r:"England", lat:51.509, lon:-0.018, alias:["Poplar"] },
+  { k:"westham",     n:"West Ham",             r:"England", lat:51.534, lon: 0.000, alias:["West Ham"] },
+  { k:"lewisham",    n:"Lewisham",             r:"England", lat:51.462, lon:-0.010, alias:["Lewisham"] },
+  { k:"downham",     n:"Downham",              r:"England", lat:51.413, lon: 0.023, alias:["Downham"] },
+
+  // --- north-west Kent and the Bexley parishes ---
+  { k:"bexleyheath", n:"Bexleyheath",          r:"England", lat:51.456, lon: 0.149, alias:["Bexleyheath"] },
+  { k:"bexley",      n:"Bexley",               r:"England", lat:51.441, lon: 0.149, alias:["Bexley"] },
+  { k:"welling",     n:"Welling & Shooters Hill", r:"England", lat:51.462, lon:0.106, alias:["Shooters Hill","Welling"] },
+  { k:"falconwood",  n:"Falconwood",           r:"England", lat:51.459, lon: 0.076, alias:["Falconwood"] },
+  { k:"sidcup",      n:"Sidcup",               r:"England", lat:51.426, lon: 0.103, alias:["Sidcup"] },
+  { k:"orpington",   n:"Orpington",            r:"England", lat:51.374, lon: 0.098, alias:["Orpington"] },
+  { k:"farnb_kent",  n:"Farnborough, Kent",    r:"England", lat:51.366, lon: 0.080, alias:["Farnborough Hospital","Farnborough, Kent"] },
+  { k:"swanscombe",  n:"Swanscombe",           r:"England", lat:51.447, lon: 0.300, alias:["Swanscombe"] },
+  { k:"stone",       n:"Stone, Kent",          r:"England", lat:51.448, lon: 0.276, alias:["Stone, Kent"] },
+  { k:"dartford",    n:"Dartford",             r:"England", lat:51.446, lon: 0.217, alias:["Dartford"] },
+  { k:"crayford",    n:"Crayford",             r:"England", lat:51.449, lon: 0.177, alias:["Crayford"] },
+  { k:"wilmington",  n:"Wilmington, Kent",     r:"England", lat:51.432, lon: 0.223, alias:["Wilmington"] },
+  { k:"darenth",     n:"Darenth",              r:"England", lat:51.420, lon: 0.240, alias:["Darenth","Gore Farm"] },
+  { k:"hortonkirby", n:"Horton Kirby",         r:"England", lat:51.390, lon: 0.240, alias:["Horton Kirby"] },
+  { k:"chatham",     n:"Chatham",              r:"England", lat:51.380, lon: 0.520, alias:["Chatham"] },
+
+  // --- Essex ---
+  { k:"romford",     n:"Romford",              r:"England", lat:51.575, lon: 0.183, alias:["Romford"] },
+  { k:"upminster",   n:"Upminster",            r:"England", lat:51.557, lon: 0.251, alias:["Upminster"] },
+  { k:"rochford",    n:"Rochford",             r:"England", lat:51.580, lon: 0.710, alias:["Rochford"] },
+  { k:"broomfield",  n:"Broomfield",           r:"England", lat:51.770, lon: 0.470, alias:["Broomfield"] },
+  { k:"leigh",       n:"Leigh-on-Sea",         r:"England", lat:51.542, lon: 0.648, alias:["Leigh"] },
+  { k:"stanford",    n:"Stanford-le-Hope",     r:"England", lat:51.515, lon: 0.429, alias:["Stanford-le-Hope"] },
+  { k:"langdon",     n:"Langdon Hills",        r:"England", lat:51.556, lon: 0.420, alias:["Langdon"] },
+
+  // --- Surrey, Hampshire and the west ---
+  { k:"guildford",   n:"Guildford",            r:"England", lat:51.236, lon:-0.570, alias:["Guildford"] },
+  { k:"woking",      n:"Woking",               r:"England", lat:51.316, lon:-0.560, alias:["Woking"] },
+  { k:"weybridge",   n:"Weybridge",            r:"England", lat:51.372, lon:-0.459, alias:["Weybridge"] },
+  { k:"farnb_hants", n:"Farnborough, Hampshire", r:"England", lat:51.290, lon:-0.753, alias:["Farnborough, Hampshire","Farnborough, Hants"] },
+  { k:"trowbridge",  n:"Trowbridge",           r:"England", lat:51.320, lon:-2.210, alias:["Trowbridge"] },
+  { k:"rothwell",    n:"Rothwell, Northants",  r:"England", lat:52.419, lon:-0.801, alias:["Rothwell"] },
+  { k:"grimsby",     n:"Grimsby",              r:"England", lat:53.567, lon:-0.080, alias:["Grimsby"] },
+  { k:"gresham",     n:"Gresham, Norfolk",     r:"England", lat:52.900, lon: 1.260, alias:["Gresham"] },
+  { k:"london",      n:"London",               r:"England", lat:51.507, lon:-0.128, alias:["London"] },
+
+  // --- Wales and Ireland ---
+  { k:"ammanford",   n:"Ammanford & Glanamman", r:"Wales",  lat:51.795, lon:-3.996, alias:["Ammanford","Glanamman","Amman Valley"] },
+  { k:"monmouth",    n:"Monmouthshire",        r:"Wales",   lat:51.790, lon:-2.850, alias:["Monmouthshire"] },
+  { k:"drogheda",    n:"Drogheda, Co. Louth",  r:"Ireland", lat:53.718, lon:-6.348, alias:["Drogheda"] },
+
+  // --- India ---
+  { k:"digboi",      n:"Digboi, Assam",        r:"India",   lat:27.393, lon:95.618, alias:["Digboi"] },
+  { k:"nazira",      n:"Nazira, Sivasagar",    r:"India",   lat:26.920, lon:94.730, alias:["Nazira","Sivasagar","Suntok"] },
+  { k:"ranchi",      n:"Doranda, Ranchi",      r:"India",   lat:23.340, lon:85.310, alias:["Doranda","Dorunda","Ranchi"] },
+  { k:"calcutta",    n:"Calcutta (Kolkata)",   r:"India",   lat:22.573, lon:88.364, alias:["Calcutta","Kolkata"] },
+  { k:"bareilly",    n:"Bareilly",             r:"India",   lat:28.367, lon:79.430, alias:["Bareilly"] },
+  { k:"mussoorie",   n:"Mussoorie",            r:"India",   lat:30.455, lon:78.070, alias:["Mussoorie","Musoorie","Waverley"] },
+  { k:"lucknow",     n:"Lucknow",              r:"India",   lat:26.850, lon:80.950, alias:["Lucknow"] },
+
+  // --- further afield ---
+  { k:"firgas",      n:"Firgas, Gran Canaria", r:"Canary Islands", lat:28.100, lon:-15.560, alias:["Firgas","Gran Canaria","Gran Canarias"] },
+  { k:"wangi",       n:"Wangi Wangi, NSW",     r:"Australia", lat:-33.070, lon:151.590, alias:["Wangi Wangi","Wangi-Wangi"] },
+  { k:"newyork",     n:"New York",             r:"United States", lat:40.713, lon:-74.006, alias:["New York"] },
+  { k:"titanic",     n:"North Atlantic — RMS Titanic", r:"At sea", lat:41.726, lon:-49.948, alias:["Titanic"] },
+
+  // --- county-level fallbacks: only reached when nothing above matched ---
+  { k:"kent",        n:"Kent (county only)",   r:"England", lat:51.250, lon: 0.700, alias:["Kent"], approx:true },
+  { k:"essex",       n:"Essex (county only)",  r:"England", lat:51.750, lon: 0.550, alias:["Essex"], approx:true },
+  { k:"surrey",      n:"Surrey (county only)", r:"England", lat:51.250, lon:-0.450, alias:["Surrey"], approx:true },
+  { k:"hants",       n:"Hampshire (county only)", r:"England", lat:51.050, lon:-1.320, alias:["Hampshire","Hants"], approx:true },
+  { k:"wilts",       n:"Wiltshire (county only)", r:"England", lat:51.350, lon:-1.990, alias:["Wiltshire","Wilts"], approx:true },
+  { k:"northants",   n:"Northamptonshire (county only)", r:"England", lat:52.270, lon:-0.880, alias:["Northamptonshire"], approx:true },
+  { k:"norfolk",     n:"Norfolk (county only)", r:"England", lat:52.630, lon: 1.000, alias:["Norfolk"], approx:true },
+  { k:"devon",       n:"Devon (county only)",  r:"England", lat:50.720, lon:-3.760, alias:["Devon"], approx:true },
+  { k:"wales",       n:"Wales (country only)", r:"Wales",   lat:52.130, lon:-3.780, alias:["Wales"], approx:true },
+  { k:"assam",       n:"Assam (region only)",  r:"India",   lat:26.200, lon:92.900, alias:["Assam"], approx:true },
+  { k:"bengal",      n:"Bengal (region only)", r:"India",   lat:23.500, lon:87.500, alias:["Bengal"], approx:true },
+  { k:"bihar",       n:"Bihar (region only)",  r:"India",   lat:25.100, lon:85.300, alias:["Bihar"], approx:true },
+  { k:"india",       n:"India (country only)", r:"India",   lat:22.000, lon:79.000, alias:["India"], approx:true },
+  { k:"canada",      n:"Canada (country only)", r:"Canada", lat:56.100, lon:-106.300, alias:["Canada"], approx:true },
+  { k:"usa",         n:"USA (country only)",   r:"United States", lat:39.800, lon:-98.600, alias:["USA","United States"], approx:true }
+];
+
+/* ---------------------------------------------------------------------------
+   Families
+   ---------------------------------------------------------------------------
+   A person belongs to a family by the surname they carried and by the surname
+   they were born with, so a woman appears under both — Elsie Alexandra Neil
+   née Inward is a Neil and an Inward.
+   ------------------------------------------------------------------------- */
+const FAMILIES = [
+  { k:"neil", label:"Neil · McNeil", surnames:["Neil","McNeil"],
+    blurb:"The name the tree carries today. It runs back only as far as Thomas George Cyril Neil, born in Plaistow in 1913 — no sheet records his parents. Stuart and Eleanor changed the spelling to McNeil in 2010." },
+  { k:"inward", label:"Inward · Innard", surnames:["Inward","Innard","Inwood"],
+    blurb:"The deepest line on the sheets: cement workers, excavators and labourers of Swanscombe, Stone and Dartford in north-west Kent, back to Samuel Innard's marriage in 1758, and out to the West Ham and Silvertown docks in the 1800s." },
+  { k:"buck", label:"Buck", surnames:["Buck"],
+    blurb:"An Anglo-Indian line: Rev. D. M. Buck of Lucknow, his son Joel Jefferson Buck of Bareilly — private secretary to seven Governors of Bihar — and Joel's son Edward, who brought the family to Kent." },
+  { k:"woolley", label:"Woolley", surnames:["Woolley"],
+    blurb:"Trowbridge in Wiltshire and Calcutta in the same breath. Herbert Leonard Woolley married Elizabeth Theresa A'Monge at Mussoorie in 1917; their daughter Barbara was born on arrival in Calcutta in 1923." },
+  { k:"amonge", label:"A’Monge", surnames:["A'Monge","A’Monge"],
+    blurb:"A French tea planter at the Assam Tea Company's headquarters in Nazira and an Irishwoman from Drogheda, and the ten children they raised between Assam and Calcutta." },
+  { k:"related", label:"Married in", surnames:[], rest:true,
+    blurb:"Everyone who married into the tree, and the families they brought with them — Collard, Ansted, Bassett, Mason, Hall, Robertson, Lloyd, Evans, Smith and the rest." }
 ];
 
 const SOURCES = {
