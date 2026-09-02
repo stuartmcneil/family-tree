@@ -16,7 +16,7 @@
    Fields
      n    display name (married surname where known)
      nee  maiden name
-     b    born        d   died        m   married
+     b    born        d   died        m   married      div  divorced
      sp   spouse id, or array of ids for more than one marriage
      f    father id   mo  mother id
      occ  occupation / office
@@ -33,14 +33,16 @@ const PEOPLE = {
   stuart: {
     n: "Stuart John McNeil", nee: "Neil", neeAs: "formerly",
     b: "27 March 1972, 8.32am — Greenwich District Hospital, London",
-    m: "19 June 2010, Treowen House, Monmouthshire, Wales — divorced 2014",
+    m: "19 June 2010, Treowen House, Monmouthshire, Wales",
+    div: "2014",
     sp: "eleanor", f: "howard", mo: "lynette", src: "S1, S2, S4, F",
     no: ["Changed surname from Neil to McNeil in 2010."]
   },
   eleanor: {
     n: "Eleanor Mary McNeil", nee: "McBride",
     b: "2 January 1980 — Rothwell, Northamptonshire",
-    m: "19 June 2010, Treowen House, Monmouthshire, Wales — divorced 2014",
+    m: "19 June 2010, Treowen House, Monmouthshire, Wales",
+    div: "2014",
     sp: "stuart", src: "S1, S2, F",
     no: ["Changed surname from Neil to McNeil in 2010, with Stuart."]
   },
@@ -116,16 +118,17 @@ const PEOPLE = {
   helena_hall: {
     n: "Helena Celine Hall",
     b: "26 September 1981 — Queen Mary's Hospital, Sidcup, Kent",
+    div: "2001 and 2009",
     sp: ["neil_thomson", "iqbal_singh", "muhenda"],
     f: "lionel_hall", mo: "celine_buck", src: "S2"
   },
   neil_thomson: { n: "Neil Thomson", sp: "helena_hall",
-    m: "27 March, Weybridge Registry Office, Surrey — divorced 2001", src: "S2",
+    m: "27 March, Weybridge Registry Office, Surrey", div: "2001", src: "S2",
     no: ["The sheet gives the marriage year as 1972, which cannot be right for a bride born in 1981; the year is an error in the original."] },
   luke_thomson: { n: "Luke Thomson / Hall", b: "10 September 1999",
     f: "neil_thomson", mo: "helena_hall", src: "S2" },
   iqbal_singh: { n: "Iqbal Singh", sp: "helena_hall",
-    m: "9 February 2008, Weybridge Registry Office — divorced 2009", src: "S2" },
+    m: "9 February 2008, Weybridge Registry Office", div: "2009", src: "S2" },
   muhenda: { n: "Muhenda Bagenda", sp: "helena_hall", m: "engaged 2011", src: "S2" },
   amaia: { n: "Amaia Bagenda", b: "24 September 2011",
     f: "muhenda", mo: "helena_hall", src: "S2" },
@@ -135,13 +138,13 @@ const PEOPLE = {
   tgc_neil: {
     n: "Thomas George Cyril Neil",
     b: "2 November 1913 — Plaistow, London",
-    m: "21 August 1937", d: "14 March 1970 — Guildford, Surrey",
+    m: "21 August 1937", div: "1949", d: "14 March 1970 — Guildford, Surrey",
     sp: "elsie", src: "S1, S4",
-    no: ["Divorced in 1949.", "His own parents are not recorded on any of the four sheets — the Neil line stops here."]
+    no: ["His own parents are not recorded on any of the four sheets — the Neil line stops here."]
   },
   elsie: {
     n: "Elsie Alexandra Neil", nee: "Inward",
-    b: "27 July 1914", m: "21 August 1937",
+    b: "27 July 1914", m: "21 August 1937", div: "1949",
     d: "14 March 2001 — at home in Bexleyheath",
     sp: "tgc_neil", f: "percy_w_inward", mo: "jennette", src: "S1, S4"
   },

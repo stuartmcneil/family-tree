@@ -65,6 +65,9 @@ Dates are always labelled, so a lone year is never ambiguous:
 
 **b.** born &nbsp;·&nbsp; **bap.** baptised &nbsp;·&nbsp; **d.** died
 
+A recorded divorce shows under the marriage on the card and as its own row in the record —
+Stuart and Eleanor 2014, Thomas George Cyril Neil and Elsie 1949, Helena Hall 2001 and 2009.
+
 Cards and lists show only the year; the full entry — day, hospital, parish, church — is in
 each person's record.
 
@@ -88,6 +91,21 @@ Dark mode has its own pair a few lines below.
 and carries the Vecteezy watermark across it, which is visible at the current strength and
 would be published along with the page. Replacing it with a licensed copy — or a
 free-licence oak from Unsplash or Pexels — is a straight file swap under the same name.
+
+### Taking it elsewhere — GEDCOM
+
+**About → Download GEDCOM** writes the whole tree as a `.ged` file: 256 people, 74 family
+groups, births, baptisms, marriages, divorces, deaths, places, notes and source citations,
+in GEDCOM 5.5.1 — the format every genealogy program and website reads. Nothing is uploaded
+anywhere; the file is built in your browser and saved straight to your machine.
+
+That file is the way to go looking for new branches. Upload it to Ancestry, MyHeritage or
+FamilySearch and their record matching starts proposing censuses, certificates and parish
+entries for these exact people; whatever you confirm, bring back here by editing `data.js`.
+
+Sex is written only where the data proves it — being recorded as somebody's father or
+mother, or carrying a maiden name — and left blank otherwise. It is never guessed from a
+forename.
 
 ### The map
 
@@ -154,6 +172,7 @@ grandad: {
   b:   "3 May 1901 — Swanscombe, Kent",
   bap: "June 1901 — St Peter & St Paul, Swanscombe",
   m:   "1924, St Mary's, Stone",
+  div: "1961",                     // optional; shows on the card and in the record
   d:   "1977 — Dartford",
   occ: "Cement worker",            // optional
   sp: "granny",                    // spouse id, or ["first_wife", "second_wife"]
@@ -184,7 +203,7 @@ the name they carried and the name they were born with, so a married woman appea
 ## Files
 
 ```
-index.html   the page — layout, tree graphics, families, map, interaction
+index.html   the page — layout, tree graphics, families, map, GEDCOM export
 data.js      every person, the place gazetteer, the family definitions
 world.js     world coastlines, simplified from Natural Earth 50m (~300 KB)
 britain.js   Britain and Ireland at 10m detail (~220 KB)

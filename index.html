@@ -150,6 +150,7 @@ main{position:relative;flex:1;min-height:0;overflow:hidden}
 .card .nee{display:block;font-family:Inter,sans-serif;font-size:10.5px;color:var(--ink-faint);font-weight:400;margin-top:1px}
 .card .dt{font-size:10.5px;color:var(--ink-soft);margin-top:3px;letter-spacing:.01em}
 .card .sp{font-size:10.5px;color:var(--ink-faint);margin-top:2px;font-style:italic}
+.card .divorced{font-size:10px;color:var(--death);margin-top:2px;letter-spacing:.03em;opacity:.9}
 .card .tag{display:block;margin:7px -11px -10px;padding:4px 8px 5px;font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;background:var(--accent);color:#fff8ee;border-radius:0 0 13px 13px}
 .grow{position:absolute;left:50%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;border:1px solid var(--card-edge);background:var(--card);display:grid;place-items:center;box-shadow:0 2px 6px var(--card-shadow);transition:.18s;padding:0}
 .grow:hover{background:var(--accent);border-color:var(--accent);color:#fff8ee;transform:translateX(-50%) scale(1.12)}
@@ -658,6 +659,7 @@ function render(opts){
         <span class="nm">${esc(p.n)}${p.nee ? `<span class="nee">${neeLabel(p)} ${esc(p.nee)}</span>` : ""}</span>
         <div class="dt">${dateShort(p) || "&nbsp;"}</div>
         ${sp.length ? `<div class="sp">m. ${esc(sp[0])}${sp.length > 1 ? ` +${sp.length - 1}` : ""}</div>` : ""}
+        ${p.div ? `<div class="divorced">divorced ${esc(p.div)}</div>` : ""}
         ${badge}
         ${isRoot && state.view === "anc" ? '<span class="tag">the tree grows from here</span>' : ""}
       </div>
@@ -777,6 +779,7 @@ function select(id){
   if (p.b) rows.push(["Born", p.b]);
   if (p.bap) rows.push(["Baptised", p.bap]);
   if (p.m) rows.push(["Married", p.m]);
+  if (p.div) rows.push(["Divorced", p.div]);
   if (p.d) rows.push(["Died", p.d]);
   if (p.occ) rows.push(["Work", p.occ]);
 
@@ -877,8 +880,17 @@ function showAbout(){
         Thomas George Cyril Neil (b. 1913, Plaistow) is the earliest Neil on any sheet; his own parents
         are not recorded. The deep lines run through his wife's family, the Inwards of Swanscombe,
         back to 1758.</p></div>
+    <div class="sect"><h3>Take it elsewhere</h3>
+      <p style="font-size:13px;line-height:1.55;color:var(--ink-soft);margin:0 0 10px">
+        Download the whole tree as a GEDCOM — the file format every genealogy program and
+        website reads. Upload it to Ancestry, MyHeritage or FamilySearch and their record
+        matching starts suggesting censuses, certificates and parish entries for these people.</p>
+      <button class="chip" id="ged-btn" style="border-color:var(--accent);color:var(--accent)">
+        ⤓ Download GEDCOM (${Object.keys(PEOPLE).length} people)</button></div>
     <div class="srcline">To add or correct someone, edit <code>data.js</code> — the tree, the search,
       the family lists and the map are all derived from it.</div>`;
+  const gb = document.getElementById("ged-btn");
+  if (gb) gb.onclick = downloadGedcom;
   openPanel();
   render();
 }
@@ -1460,6 +1472,210 @@ document.addEventListener("keydown", e => {
   if (e.key === "/" && document.activeElement !== q){ e.preventDefault(); q.focus(); }
   if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
 });
+
+/* =====================================================================
+   GEDCOM export
+   ---------------------------------------------------------------------
+   Writes the whole tree as GEDCOM 5.5.1 — the format every genealogy
+   program and website reads. Upload it to Ancestry, MyHeritage or
+   FamilySearch and their record-matching will start suggesting censuses,
+   certificates and parish entries for these people.
+   ===================================================================== */
+const MONTHS = { january:"JAN", february:"FEB", march:"MAR", april:"APR", may:"MAY",
+  june:"JUN", july:"JUL", august:"AUG", september:"SEP", october:"OCT",
+  november:"NOV", december:"DEC" };
+
+function gedDate(text){
+  if (!text) return null;
+  const t = String(text).split("—")[0].trim();           // drop the place half
+  let m = t.match(/\b(\d{1,2})\s+([A-Za-z]+)\s+(1[5-9]\d{2}|20\d{2})\b/);
+  if (m && MONTHS[m[2].toLowerCase()]) return `${+m[1]} ${MONTHS[m[2].toLowerCase()]} ${m[3]}`;
+  m = t.match(/\b([A-Za-z]+)\s+(1[5-9]\d{2}|20\d{2})\b/);
+  if (m && MONTHS[m[1].toLowerCase()]) return `${MONTHS[m[1].toLowerCase()]} ${m[2]}`;
+  m = t.match(/\b(1[5-9]\d{2}|20\d{2})\b/);
+  return m ? m[1] : null;
+}
+function gedPlace(text, fallbackPlace){
+  if (text && text.includes("—")){
+    const tail = text.split("—").slice(1).join("—").trim()
+      .replace(/^at\s+home\s*(,|\s+in)\s*/i, "")
+      .replace(/^at\s+/i, "");
+    if (tail) return tail;
+  }
+  return fallbackPlace ? fallbackPlace.n.replace(/ \(.*\)$/, "") : null;
+}
+function gedText(s){ return String(s).replace(/@/g, "@@").replace(/\s*\n\s*/g, " ").trim(); }
+
+function gedLines(level, tag, text){
+  // GEDCOM lines are capped; long notes continue with CONC
+  const out = [];
+  let t = gedText(text);
+  const CAP = 200;
+  out.push(`${level} ${tag} ${t.slice(0, CAP)}`);
+  t = t.slice(CAP);
+  while (t.length){ out.push(`${level + 1} CONC ${t.slice(0, CAP)}`); t = t.slice(CAP); }
+  return out;
+}
+
+function buildGedcom(){
+  const ids = Object.keys(PEOPLE);
+  const IX = {}; ids.forEach((id, i) => IX[id] = `@I${i + 1}@`);
+
+  // Sex is inferred only from how the data actually uses each person: being
+  // someone's father or mother is the strongest evidence, a maiden name the
+  // weakest. Never guessed from a forename, and left out when unknown.
+  const sex = {};
+  for (const id of ids){
+    const p = PEOPLE[id];
+    if (p.f) sex[p.f] = "M";
+    if (p.mo) sex[p.mo] = "F";
+  }
+  for (const id of ids){
+    const p = PEOPLE[id];
+    if (!sex[id] && p.nee && !p.neeAs) sex[id] = "F";   // neeAs marks a changed, not maiden, name
+  }
+
+  // families: a couple with children, or a couple with none
+  const fams = new Map();
+  const keyOf = (a, b) => [a || "?", b || "?"].sort().join("|");
+  const famFor = (a, b) => {
+    const k = keyOf(a, b);
+    if (!fams.has(k)) fams.set(k, { husb: null, wife: null, chil: [], members: new Set() });
+    const f = fams.get(k);
+    [a, b].filter(Boolean).forEach(x => f.members.add(x));
+    return f;
+  };
+  for (const id of ids){
+    const p = PEOPLE[id];
+    if (!p.f && !p.mo) continue;
+    const f = famFor(p.f, p.mo);
+    if (p.f) f.husb = p.f;
+    if (p.mo) f.wife = p.mo;
+    f.chil.push(id);
+  }
+  for (const id of ids){
+    for (const s of spouses(PEOPLE[id])){
+      if (!PEOPLE[s]) continue;
+      const f = famFor(id, s);
+      if (!f.husb && !f.wife){
+        if (sex[id] === "F" || sex[s] === "M"){ f.wife = id; f.husb = s; }
+        else { f.husb = id; f.wife = s; }
+      } else if (f.husb && !f.wife && f.husb !== id && f.husb !== s){
+        f.wife = f.husb === id ? s : id;
+      } else if (!f.husb && f.wife){
+        f.husb = f.wife === id ? s : id;
+      } else if (f.husb && f.wife){
+        /* already a couple */
+      }
+      // marriage and divorce details, taken from whichever partner records them
+      for (const who of [id, s]){
+        const q = PEOPLE[who];
+        if (q.m && !f.m) f.m = q.m;
+        if (q.div && !f.div) f.div = q.div;
+      }
+    }
+  }
+  const FX = {}; let n = 0;
+  for (const [k] of fams) FX[k] = `@F${++n}@`;
+
+  const famcOf = {}, famsOf = {};
+  for (const [k, f] of fams){
+    f.chil.forEach(c => famcOf[c] = FX[k]);
+    [f.husb, f.wife].filter(Boolean).forEach(x => (famsOf[x] = famsOf[x] || []).push(FX[k]));
+  }
+
+  const L = [];
+  const today = new Date();
+  const dd = `${today.getDate()} ${["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][today.getMonth()]} ${today.getFullYear()}`;
+  L.push("0 HEAD", "1 SOUR MCNEIL_FAMILY_TREE", "2 NAME The McNeil Family Tree",
+         "2 VERS 1.0", "1 DEST ANY", `1 DATE ${dd}`,
+         "1 GEDC", "2 VERS 5.5.1", "2 FORM LINEAGE-LINKED", "1 CHAR UTF-8",
+         "1 SUBM @SUB1@");
+  L.push("0 @SUB1@ SUBM", "1 NAME The McNeil Family Tree");
+
+  const srcKeys = Object.keys(SOURCES);
+  const SX = {}; srcKeys.forEach((k, i) => SX[k] = `@S${i + 1}@`);
+
+  for (const id of ids){
+    const p = PEOPLE[id];
+    L.push(`0 ${IX[id]} INDI`);
+    const disp = p.n.replace(/^—\s*/, "");
+    const parts = disp.split(/\s+/);
+    const surname = parts.length > 1 ? parts[parts.length - 1] : disp;
+    const given = parts.length > 1 ? parts.slice(0, -1).join(" ") : "";
+    if (p.nee && !p.neeAs){                 // a maiden name: birth surname leads
+      L.push(`1 NAME ${gedText(given)} /${gedText(p.nee)}/`);
+      L.push(`1 NAME ${gedText(given)} /${gedText(surname)}/`, "2 TYPE married");
+    } else if (p.nee){                      // a surname changed for another reason
+      L.push(`1 NAME ${gedText(given)} /${gedText(surname)}/`);
+      L.push(`1 NAME ${gedText(given)} /${gedText(p.nee)}/`, "2 TYPE birth");
+    } else {
+      L.push(`1 NAME ${gedText(given)} /${gedText(surname)}/`);
+    }
+    if (sex[id]) L.push(`1 SEX ${sex[id]}`);
+
+    const ev = (tag, text, place) => {
+      const d = gedDate(text), pl = gedPlace(text, place);
+      if (!d && !pl && !text) return;
+      L.push(`1 ${tag}`);
+      if (d) L.push(`2 DATE ${d}`);
+      if (pl) L.push(...gedLines(2, "PLAC", pl));
+      if (text && !d) L.push(...gedLines(2, "NOTE", text));
+    };
+    if (p.b) ev("BIRT", p.b, birthPlace(p));
+    if (p.bap) ev("BAPM", p.bap, null);
+    if (p.d) ev("DEAT", p.d, deathPlace(p));
+    if (p.occ) L.push(...gedLines(1, "OCCU", p.occ));
+
+    if (famcOf[id]) L.push(`1 FAMC ${famcOf[id]}`);
+    (famsOf[id] || []).forEach(f => L.push(`1 FAMS ${f}`));
+
+    (p.no || []).forEach(t => L.push(...gedLines(1, "NOTE", t)));
+    if (p.un) L.push(...gedLines(1, "NOTE",
+      "Parent link inferred from the layout of the source sheet rather than stated outright — unverified."));
+    (p.src || "").split(",").map(s => s.trim()).filter(s => SX[s]).forEach(s => L.push(`1 SOUR ${SX[s]}`));
+  }
+
+  for (const [k, f] of fams){
+    L.push(`0 ${FX[k]} FAM`);
+    if (f.husb) L.push(`1 HUSB ${IX[f.husb]}`);
+    if (f.wife) L.push(`1 WIFE ${IX[f.wife]}`);
+    f.chil.forEach(c => L.push(`1 CHIL ${IX[c]}`));
+    if (f.m){
+      const d = gedDate(f.m), pl = f.m.replace(/^[^,]*,\s*/, "");
+      L.push("1 MARR");
+      if (d) L.push(`2 DATE ${d}`);
+      if (pl && pl !== f.m) L.push(...gedLines(2, "PLAC", pl));
+      if (!d) L.push(...gedLines(2, "NOTE", f.m));
+    }
+    if (f.div){
+      L.push("1 DIV");
+      const d = gedDate(f.div);
+      if (d) L.push(`2 DATE ${d}`); else L.push(...gedLines(2, "NOTE", f.div));
+    }
+  }
+
+  for (const k of srcKeys){
+    L.push(`0 ${SX[k]} SOUR`);
+    L.push(...gedLines(1, "TITL", SOURCES[k]));
+    L.push("1 ABBR " + k);
+  }
+
+  L.push("0 TRLR");
+  return L.join("\r\n") + "\r\n";
+}
+
+function downloadGedcom(){
+  const blob = new Blob([buildGedcom()], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mcneil-family-tree.ged";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
 
 /* =====================================================================
    Go
