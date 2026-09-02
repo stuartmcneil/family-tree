@@ -33,16 +33,24 @@ const PEOPLE = {
   stuart: {
     n: "Stuart John McNeil", nee: "Neil", neeAs: "formerly",
     b: "27 March 1972, 8.32am — Greenwich District Hospital, London",
-    m: "19 June 2010, Treowen House, Monmouthshire, Wales",
-    sp: "eleanor", f: "howard", mo: "lynette", src: "S1, S2, S4",
+    m: "19 June 2010, Treowen House, Monmouthshire, Wales — divorced 2014",
+    sp: "eleanor", f: "howard", mo: "lynette", src: "S1, S2, S4, F",
     no: ["Changed surname from Neil to McNeil in 2010."]
   },
   eleanor: {
     n: "Eleanor Mary McNeil", nee: "McBride",
     b: "2 January 1980 — Rothwell, Northamptonshire",
-    m: "19 June 2010, Treowen House, Monmouthshire, Wales",
-    sp: "stuart", src: "S1, S2",
+    m: "19 June 2010, Treowen House, Monmouthshire, Wales — divorced 2014",
+    sp: "stuart", src: "S1, S2, F",
     no: ["Changed surname from Neil to McNeil in 2010, with Stuart."]
+  },
+  isobel_jones: {
+    n: "Isobel Jones", b: "25 July 2009",
+    f: "stuart", src: "F"
+  },
+  nate_mcneil: {
+    n: "Nate Bootsy McNeil", b: "24 July 2013",
+    f: "stuart", src: "F"
   },
   loretta: {
     n: "Loretta Andrea Evans", nee: "Neil",
@@ -872,13 +880,14 @@ const FAMILIES = [
     blurb:"Trowbridge in Wiltshire and Calcutta in the same breath. Herbert Leonard Woolley married Elizabeth Theresa A'Monge at Mussoorie in 1917; their daughter Barbara was born on arrival in Calcutta in 1923." },
   { k:"amonge", label:"A’Monge", surnames:["A'Monge","A’Monge"],
     blurb:"A French tea planter at the Assam Tea Company's headquarters in Nazira and an Irishwoman from Drogheda, and the ten children they raised between Assam and Calcutta." },
-  { k:"related", label:"Married in", surnames:[], rest:true,
-    blurb:"Everyone who married into the tree, and the families they brought with them — Collard, Ansted, Bassett, Mason, Hall, Robertson, Lloyd, Evans, Smith and the rest." }
+  { k:"related", label:"Other names", surnames:[], rest:true,
+    blurb:"Everyone in the tree carrying a name of their own — those who married in and the families they brought with them, and the children who took another surname: Collard, Ansted, Bassett, Mason, Hall, Robertson, Lloyd, Evans, Jones, Smith and the rest." }
 ];
 
 const SOURCES = {
   S1: "Family history of Stuart John McNeil (Neil) — summary sheet",
   S2: "Maternal family tree of the Neil / Buck / Woolley / A'Monge family",
   S3: "Innard / Inward family tree 2 — Swanscombe, 1767",
-  S4: "Innard / Inward family tree 1 — Swanscombe, 1758"
+  S4: "Innard / Inward family tree 1 — Swanscombe, 1758",
+  F:  "Family knowledge — not on the four sheets"
 };

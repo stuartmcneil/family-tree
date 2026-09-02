@@ -155,6 +155,9 @@ main{position:relative;flex:1;min-height:0;overflow:hidden}
 .grow:hover{background:var(--accent);border-color:var(--accent);color:#fff8ee;transform:translateX(-50%) scale(1.12)}
 .grow.up{top:-13px}
 .grow.down{bottom:-13px}
+/* the root's children toggle sits in the corner, clear of the ribbon and the trunk */
+.grow.kids{left:auto;right:-12px;bottom:-12px;transform:none}
+.grow.kids:hover{transform:scale(1.12)}
 .grow span{font-size:15px;line-height:1;font-weight:600;margin-top:-1px}
 .count{position:absolute;right:-8px;top:-8px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--leaf-3);color:#f3fae9;font-size:10.5px;font-weight:600;display:grid;place-items:center;box-shadow:0 2px 5px var(--card-shadow)}
 
@@ -416,6 +419,7 @@ const NW = 176, VGAP = 132, HGAP = 24, NODE_H = 78;
 const state = {
   view: "anc",
   ancOpen: new Set([ROOT_ID, "howard", "lynette"]),
+  rootKids: true,          // the root's own children, shown at the foot of the trunk
   desOpen: new Set(),
   desRoot: PROGENITORS[0].id,
   fam: FAMILIES[0].k,
@@ -519,6 +523,26 @@ function render(opts){
   const items = flatten(tree, 0, []);
   const links = edges(tree, 0, []);
 
+  /* The root's own children sit at the foot of the trunk — the tree grows up into
+     the past and down into the present. Only ever one generation deep here; the
+     Wider family view is where descendants are properly explored. */
+  const saplings = [];
+  if (state.view === "anc" && state.rootKids){
+    const rootItem = items.find(i => i.id === rootId);
+    const ch = kids(rootId);
+    if (rootItem && ch.length){
+      const span = ch.length * NW + (ch.length - 1) * HGAP;
+      let x = rootItem.cx - span / 2;
+      const y = rootItem.y + VGAP + 92;
+      for (const cid of ch){
+        const it = { id: cid, x, y, depth: 0, open: false, hasMore: false,
+                     cx: x + NW / 2, sapling: true };
+        items.push(it); saplings.push(it);
+        x += NW + HGAP;
+      }
+    }
+  }
+
   const xs = items.map(i => i.x), ys = items.map(i => i.y);
   const minX = Math.min(...xs) - 90, maxX = Math.max(...xs) + NW + 90;
   const minY = Math.min(...ys) - 70, maxY = Math.max(...ys) + NODE_H + 160;
@@ -538,9 +562,24 @@ function render(opts){
   if (root){
     const rx = root.cx + offX, ry = root.y + offY;
     if (state.view === "anc"){
-      gfx += `<path d="M${rx} ${ry + NODE_H} C ${rx - 4} ${ry + NODE_H + 55}, ${rx + 6} ${ry + NODE_H + 90}, ${rx} ${H}"
-               stroke="url(#bark)" stroke-width="20" stroke-linecap="round" fill="none" opacity=".9"/>
-              <ellipse cx="${rx}" cy="${H - 6}" rx="86" ry="13" fill="var(--bark-2)" opacity=".16"/>`;
+      if (saplings.length){
+        // trunk down to the ground, then roots spreading out to the children
+        const gy = saplings[0].y + offY - 52;
+        gfx += `<path d="M${rx} ${ry + NODE_H} C ${rx - 4} ${ry + NODE_H + 40}, ${rx + 5} ${gy - 30}, ${rx} ${gy}"
+                 stroke="url(#bark)" stroke-width="20" stroke-linecap="round" fill="none" opacity=".9"/>
+                <ellipse cx="${rx}" cy="${gy + 2}" rx="96" ry="14" fill="var(--bark-2)" opacity=".18"/>`;
+        for (const s of saplings){
+          const sx = s.cx + offX, sy = s.y + offY;
+          gfx += `<path d="M${rx} ${gy} C ${rx + (sx - rx) * .45} ${gy + 8}, ${sx} ${gy + 10}, ${sx} ${sy}"
+                   stroke="url(#bark)" stroke-width="7" stroke-linecap="round" fill="none" opacity=".8"/>
+                  <ellipse cx="${((rx + sx) / 2).toFixed(1)}" cy="${(gy + (sy - gy) * .45).toFixed(1)}" rx="6" ry="4"
+                   fill="var(--leaf-2)" opacity=".75"/>`;
+        }
+      } else {
+        gfx += `<path d="M${rx} ${ry + NODE_H} C ${rx - 4} ${ry + NODE_H + 55}, ${rx + 6} ${ry + NODE_H + 90}, ${rx} ${H}"
+                 stroke="url(#bark)" stroke-width="20" stroke-linecap="round" fill="none" opacity=".9"/>
+                <ellipse cx="${rx}" cy="${H - 6}" rx="86" ry="13" fill="var(--bark-2)" opacity=".16"/>`;
+      }
     } else {
       gfx += `<path d="M${rx} ${ry} C ${rx - 4} ${ry - 40}, ${rx + 6} ${ry - 60}, ${rx} ${Math.max(6, ry - 74)}"
                stroke="url(#bark)" stroke-width="18" stroke-linecap="round" fill="none" opacity=".9"/>`;
@@ -623,13 +662,18 @@ function render(opts){
         ${isRoot && state.view === "anc" ? '<span class="tag">the tree grows from here</span>' : ""}
       </div>
       ${it.hasMore ? `<button class="grow ${dirClass}" title="${it.open ? "Hide" : "Show"} ${label}">
-          <span>${it.open ? "−" : "+"}</span></button>` : ""}`;
+          <span>${it.open ? "−" : "+"}</span></button>` : ""}
+      ${isRoot && state.view === "anc" && kids(rootId).length
+        ? `<button class="grow down kids" title="${state.rootKids ? "Hide" : "Show"} children">
+             <span>${state.rootKids ? "−" : "+"}</span></button>` : ""}`;
 
     const card = el.querySelector(".card");
     card.onclick = () => select(it.id);
     card.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); select(it.id); } };
-    const g = el.querySelector(".grow");
+    const g = el.querySelector(".grow:not(.kids)");
     if (g) g.onclick = e => { e.stopPropagation(); toggleNode(it.id); };
+    const gk = el.querySelector(".grow.kids");
+    if (gk) gk.onclick = e => { e.stopPropagation(); state.rootKids = !state.rootKids; render(); };
   }
   for (const el of [...nodeLayer.children]){
     if (!present.has(el.dataset.id)){
@@ -844,6 +888,7 @@ document.getElementById("btn-about").onclick = showAbout;
 document.getElementById("home").onclick = () => {
   closePanel();
   state.ancOpen = new Set([ROOT_ID, "howard", "lynette"]);
+  state.rootKids = true;
   state.desOpen = new Set();
   state.desRoot = PROGENITORS[0].id;
   state.fam = FAMILIES[0].k;
@@ -883,6 +928,13 @@ function topAncestorOf(id){
 }
 function goTo(id){
   if (!PEOPLE[id]) return;
+  // the root's own children are already on the Ancestors view, at the foot of the trunk
+  if (kids(ROOT_ID).includes(id)){
+    state.rootKids = true;
+    setView("anc", true);
+    requestAnimationFrame(() => { centerOn(id); select(id); });
+    return;
+  }
   const ancPath = pathFromRootAnc(id);
   if (ancPath){
     ancPath.slice(0, -1).forEach(x => state.ancOpen.add(x));
@@ -1024,7 +1076,7 @@ function wireSubbar(){
     render({ fit: true });
   };
   if (g("btn-prune")) g("btn-prune").onclick = () => {
-    if (state.view === "anc") state.ancOpen = new Set([ROOT_ID, "howard", "lynette"]);
+    if (state.view === "anc"){ state.ancOpen = new Set([ROOT_ID, "howard", "lynette"]); state.rootKids = true; }
     else state.desOpen = new Set([state.desRoot]);
     render({ fit: true });
   };

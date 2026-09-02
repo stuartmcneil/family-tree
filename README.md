@@ -1,13 +1,15 @@
 # The McNeil Family Tree
 
 An interactive family tree for the **Neil / McNeil, Inward (Innard), Buck, Woolley and
-A'Monge** families — 254 people, transcribed from four typed family-history sheets held in
-the family papers.
+A'Monge** families — 256 people, transcribed from four typed family-history sheets held in
+the family papers, plus what has been added since.
 
 Four ways in:
 
 - **Ancestors** — a drawn tree that grows from Stuart John McNeil at the root, back through
-  the generations. Click `+` on any card to grow the next one.
+  the generations. Click `+` on any card to grow the next one. His own children sit at the
+  foot of the trunk, on roots rather than branches; the `−` in the corner of his card folds
+  them away.
 - **Wider family** — pick an older couple and grow their descendants downward instead.
 - **Families** — every member of each surname, with their dates and places, on one page.
 - **Map** — where the family was born and where it died, from Swanscombe to Assam.
@@ -117,8 +119,10 @@ records.
 | **S2** | Maternal family tree of the Neil / Buck / Woolley / A'Monge family |
 | **S3** | Innard / Inward family tree 2 — Swanscombe, 1767 |
 | **S4** | Innard / Inward family tree 1 — Swanscombe, 1758 |
+| **F** | Family knowledge — added since, not on the sheets |
 
-Everything on the page comes from these. Nothing has been added from outside them. Where a
+Everything typed on the sheets is here, and anything added since carries the **F** source so
+it is never mistaken for something the sheets say. Where a
 sheet contradicts itself — a birth year of "1048", a marriage dated before the bride was
 born, a death recorded before a birth — the original wording is kept and the problem is
 flagged in that person's notes rather than quietly corrected.
