@@ -21,6 +21,8 @@
   --panel:#fbf5e9; --line:rgba(107,76,51,.22); --focus:#c2762f;
   --sea:#c9d2cd; --land:#f2e7d1; --coast:#9d8a6c;
   --birth:#4a7c2f; --death:#a8501f;
+  /* the photographic backdrop — turn it down or off here */
+  --backdrop:.42; --backdrop-blur:.8px;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -34,6 +36,7 @@
     --panel:#221e18; --line:rgba(220,190,150,.20); --focus:#e0a061;
     --sea:#141a1b; --land:#332c21; --coast:#6b5d45;
     --birth:#8cc264; --death:#e09052;
+    --backdrop:.24; --backdrop-blur:1px;
   }
 }
 *{box-sizing:border-box}
@@ -45,10 +48,30 @@ body{
 }
 button{font:inherit;color:inherit;cursor:pointer}
 
+/* ========================== backdrop ==========================
+   A photograph of a real tree behind the drawn one. It sits under
+   everything, softened and scrimmed so cards and text stay legible;
+   the map paints its own sea on top, so it never shows through there. */
+#backdrop{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+#backdrop::before{
+  content:"";position:absolute;inset:-14px;
+  background:url("tree.jpg") center bottom / cover no-repeat;
+  opacity:var(--backdrop);filter:blur(var(--backdrop-blur)) saturate(.82);
+}
+#backdrop::after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(90% 62% at 50% 96%, color-mix(in srgb,var(--bg) 55%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb,var(--bg) 58%, transparent) 20%,
+                    color-mix(in srgb,var(--bg) 22%, transparent) 52%,
+                    color-mix(in srgb,var(--bg) 38%, transparent) 100%);
+}
+
 /* ============================ header ============================ */
 header{
   position:relative;z-index:30;display:flex;align-items:center;gap:14px;
-  padding:10px 16px;background:var(--bg-2);
+  padding:10px 16px;background:color-mix(in srgb,var(--bg-2) 86%, transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);flex-wrap:wrap;flex:none;
 }
 .brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0;
@@ -88,7 +111,8 @@ a.tool.out svg{opacity:.8}
 /* ============================ subbar ============================ */
 #subbar{
   flex:none;z-index:22;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  padding:8px 16px;background:color-mix(in srgb,var(--bg-2) 55%, var(--bg));
+  padding:8px 16px;background:color-mix(in srgb,var(--bg-2) 62%, transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);min-height:46px;
 }
 .seg{display:flex;border:1px solid var(--card-edge);border-radius:9px;overflow:hidden;background:var(--card)}
@@ -108,7 +132,7 @@ main{position:relative;flex:1;min-height:0;overflow:hidden}
 .view.on{display:block}
 
 #scene{position:absolute;inset:0;cursor:grab;
-  background:radial-gradient(120% 90% at 50% 108%, color-mix(in srgb,var(--leaf-3) 16%, transparent), transparent 62%);
+  background:radial-gradient(120% 90% at 50% 108%, color-mix(in srgb,var(--leaf-3) 12%, transparent), transparent 62%);
   touch-action:none}
 #scene.grabbing{cursor:grabbing}
 #world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
@@ -232,6 +256,8 @@ body.panel-open #zoom{right:388px}
 </style>
 </head>
 <body>
+
+<div id="backdrop" aria-hidden="true"></div>
 
 <header>
   <button class="brand" id="home" title="Back to the start of the tree">

@@ -66,6 +66,27 @@ Dates are always labelled, so a lone year is never ambiguous:
 Cards and lists show only the year; the full entry — day, hospital, parish, church — is in
 each person's record.
 
+### The backdrop
+
+A photograph of an oak sits behind the whole page, blurred and scrimmed so cards and text
+stay readable, and darkened to a night tree in dark mode. The map paints its own sea over
+the top, so it never shows through there.
+
+To change the picture, drop a new `tree.jpg` in beside `index.html` — no code to edit. To
+make it stronger, fainter or gone entirely, change one line near the top of `index.html`:
+
+```css
+--backdrop:.42;          /* 0 hides it completely */
+--backdrop-blur:.8px;
+```
+
+Dark mode has its own pair a few lines below.
+
+**One caveat about the current file:** the `tree.jpg` in this repo is a Vecteezy preview
+and carries the Vecteezy watermark across it, which is visible at the current strength and
+would be published along with the page. Replacing it with a licensed copy — or a
+free-licence oak from Unsplash or Pexels — is a straight file swap under the same name.
+
 ### The map
 
 Pins are sized by how many people belong to a place and are split green/rust when a place
@@ -163,6 +184,7 @@ index.html   the page — layout, tree graphics, families, map, interaction
 data.js      every person, the place gazetteer, the family definitions
 world.js     world coastlines, simplified from Natural Earth 50m (~300 KB)
 britain.js   Britain and Ireland at 10m detail (~220 KB)
+tree.jpg     the photograph behind the page
 README.md    this file
 ```
 
