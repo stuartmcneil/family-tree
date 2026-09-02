@@ -262,6 +262,11 @@ const PEOPLE = {
   },
   robertson_sr: { n: "— Robertson", sp: "mary_amonge", src: "S2",
     no: ["Forename not given on the sheet."] },
+  mary_vincent: {
+    n: "Mary Vincent", src: "S1",
+    no: ["Barbara Woolley's godmother, and lived with her in Calcutta.",
+         "Named on the summary sheet as 'Aunty Mary Vincent', in the same breath as Aunts Millie Collard and Mary Robertson — both of them A'Monge sisters. That makes her a strong candidate for one of the five unrecorded A'Monge daughters, married name Vincent, but the sheets do not say so and no link is drawn here."]
+  },
 
   /* ----- Collard / Ansted / Bassett / Mason branch ----- */
   mary_collard: {
@@ -388,7 +393,7 @@ const PEOPLE = {
   },
   frederick_bagley: { n: "Frederick Bagley", sp: "rosetta_inward", src: "S4" },
   henry_inward_1881: {
-    n: "Henry Inward", b: "1881 — Plaistow, West Ham", sp: "emily_bagley",
+    n: "Henry Walter Inward", b: "1881 — Plaistow, West Ham", sp: "emily_bagley",
     f: "george_inward_1840", mo: "sarah_hutchings", src: "S4",
     no: ["Emigrated to Canada."]
   },
@@ -634,7 +639,7 @@ const PEOPLE = {
   david_inward_1816: { n: "David Inward", b: "1816", sp: "ann_smith", src: "S3" },
   ann_smith: { n: "Ann Inward", nee: "Smith", b: "1816 — Horton Kirby",
     sp: "david_inward_1816", src: "S3" },
-  tamar_inward: { n: "Tamar Inward", b: "1812", src: "S3" },
+  tamar_inward: { n: "Tamar Inward", b: "1812", d: "1813", src: "S3" },
   daniel_inward: { n: "Daniel Inward", b: "1814", sp: "jane_lane", src: "S3" },
   jane_lane: { n: "Jane Inward", nee: "Lane", b: "1818?", sp: "daniel_inward", src: "S3" },
   mary_inward_1816: { n: "Mary Inward", b: "1816", src: "S3" },
