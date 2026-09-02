@@ -115,6 +115,8 @@ const PEOPLE = {
     m: "2 February 2008", sp: "jonathan_hall", src: "S2" },
   hannah_hall: { n: "Hannah Hall", b: "2009", d: "2009",
     f: "jonathan_hall", mo: "margarita", src: "S2" },
+  penny_hall: { n: "Penny Hall", f: "jonathan_hall", src: "F" },
+  danny_hall: { n: "Danny Hall", f: "jonathan_hall", src: "F" },
   helena_hall: {
     n: "Helena Celine Hall",
     b: "26 September 1981 — Queen Mary's Hospital, Sidcup, Kent",
